@@ -53,4 +53,5 @@ compile_mono_external_import(
     TARGET ExternalVMLFNA
 )
 
+#add_subdirectory(lib)
 add_subdirectory(src)

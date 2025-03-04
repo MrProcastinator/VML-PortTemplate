@@ -9,10 +9,6 @@ if("${SFV_FOLDER}" STREQUAL "")
   message(FATAL_ERROR "You must specify Unity Support for Vita installation folder by setting SFV_FOLDER")
 endif()
 
-if("${VML_FOLDER}" STREQUAL "")
-  message(FATAL_ERROR "You must specify Vita Mono Loader installation folder by setting VML_FOLDER")
-endif()
-
 if("${MONO_PATH}" STREQUAL "")
   message(FATAL_ERROR "You must specify mono-xcompiler Mono folder by setting MONO_PATH")
 endif()

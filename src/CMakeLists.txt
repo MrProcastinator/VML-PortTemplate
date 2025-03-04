@@ -130,7 +130,7 @@ NAME ${VITA_APP_NAME}
 
 # Optional: used for "send" target
 set(PSVITA_IP "" CACHE STRING "PSVita IP (for FTP access)")
-set(VITA3K_PATH "" CACHE STRING "PSVita IP (for FTP access)")
+set(VITA3K_PATH "" CACHE STRING "Vita3K preferred folder path")
 
 add_custom_target(send
   COMMAND echo destroy | nc ${PSVITA_IP} 1338
