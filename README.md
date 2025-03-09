@@ -110,6 +110,7 @@ This template provides a set of CMake variables to allow build customization acc
 |:-------------------|:------------------------------------------
 |`VITA3K_PATH`         | Path to the Vita3K preferred folder path (optional)
 |`PSVITA_IP`         | PSVita IPv4 address for FTP access (optional)
+|`FOR_VITA3K`         | Indicates whether this build will be executed on Vita3K or a physical PSVita (optional, default: OFF)
 
 ## Tips
 
