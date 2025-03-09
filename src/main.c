@@ -9,8 +9,6 @@
 
 #include <VML/VML.h>
 #include <VML/SDL2/SDL.h>
-#include <VML/SDL2/SDL_image.h>
-#include <VML/SDL2/SDL_mixer.h>
 #include <VML/FAudio.h>
 #include <VML/Theorafile.h>
 #include <VML/FNA.h>
@@ -56,6 +54,14 @@ int loadModules()
 		fprintf(mono_log, "[VMLPortTemplate] sceSysmoduleLoadModule(SCE_SYSMODULE_NET) ran successfully!\n");
 	}
 	cont &= (ret >= 0);
+
+#ifdef USE_CUSTOM_LIBC
+	ret = tryLoadModule(LIBFIOS2_PATH);
+	cont &= (ret > 0);
+
+	ret = tryLoadModule(LIBC_PATH);
+	cont &= (ret > 0);
+#endif
 	
 	ret = tryLoadModule(SUPRX_MANAGER_PATH);
 	cont &= (ret > 0);
@@ -66,22 +72,12 @@ int loadModules()
 	ret = tryLoadModule(MONO_VITA_PATH);
 	cont &= (ret > 0);
 
-#ifdef USE_CUSTOM_LIBC
-	ret = tryLoadModule(LIBFIOS2_PATH);
-	cont &= (ret > 0);
-
-	ret = tryLoadModule(LIBC_PATH);
-	cont &= (ret > 0);
-#endif
-
 	return cont;
 }
 
 void rootEntry()
 {
     VMLSDL2Register();
-	VMLSDL2ImageRegister();
-    VMLSDL2MixerRegister();
     VMLFNAFAudioRegister();
     VMLFNATheorafileRegister();
     VMLFNARegister();

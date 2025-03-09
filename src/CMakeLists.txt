@@ -29,9 +29,6 @@ set(MONO_REFERENCES
 
 set(VML_PORT_TEMPLATE_REFERENCES
   SDL2.dll
-  SDL2_image.dll
-  SDL2_mixer.dll
-  SDL2_mixer.dll
   FAudio-CS.dll
   Theorafile.dll
   FNA.dll
@@ -48,8 +45,6 @@ get_mono_files(VML_FILES)
 
 set(FNA_FILES
   ${CMAKE_BINARY_DIR}/SDL2.dll VML/SDL2.dll
-  ${CMAKE_BINARY_DIR}/SDL2_image.dll VML/SDL2_image.dll
-  ${CMAKE_BINARY_DIR}/SDL2_mixer.dll VML/SDL2_mixer.dll
   ${CMAKE_BINARY_DIR}/FAudio-CS.dll VML/FAudio-CS.dll
   ${CMAKE_BINARY_DIR}/Theorafile.dll VML/Theorafile.dll
   ${CMAKE_BINARY_DIR}/FNA.dll VML/FNA.dll
@@ -84,13 +79,13 @@ add_dependencies(${PROJECT_NAME} ExternalVMLFNA)
 
 # VML libraries
 target_link_libraries(${PROJECT_NAME} VitaMonoLoader VMLCoreAssemblies)
-target_link_libraries(${PROJECT_NAME} VMLSDL2 VMLSDL2_image VMLSDL2_mixer VMLFAudio VMLTheorafile VMLFNA)
+target_link_libraries(${PROJECT_NAME} VMLSDL2 VMLFAudio VMLTheorafile VMLFNA)
 
 # FNA dependencies
 target_link_libraries(${PROJECT_NAME} FAudio theorafile FNA3D mojoshader)
 
 # SDL and opengl
-target_link_libraries(${PROJECT_NAME} ${SDL2_IMAGE_LIBRARY} ${SDL2_IMAGE_DEPENDENCIES} ${SDL2_MIXER_LIBRARY} ${SDL2_MIXER_DEPENDENCIES} ${SDL2_LIBRARY} ${GL_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY} ${GL_LIBRARY})
 
 # newlib and utils
 target_link_libraries(${PROJECT_NAME} m z supc++)
@@ -175,12 +170,6 @@ add_custom_target(send_v3k
     ${CMAKE_BINARY_DIR}/SDL2.dll
     ${VITA3K_PATH}/ux0/app/${VITA_TITLEID}/VML/SDL2.dll
   COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_BINARY_DIR}/SDL2_image.dll
-    ${VITA3K_PATH}/ux0/app/${VITA_TITLEID}/VML/SDL2_image.dll
-  COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_BINARY_DIR}/SDL2_mixer.dll
-    ${VITA3K_PATH}/ux0/app/${VITA_TITLEID}/VML/SDL2_mixer.dll
-  COMMAND ${CMAKE_COMMAND} -E copy
     ${CMAKE_BINARY_DIR}/FAudio-CS.dll
     ${VITA3K_PATH}/ux0/app/${VITA_TITLEID}/VML/FAudio-CS.dll
   COMMAND ${CMAKE_COMMAND} -E copy
@@ -198,11 +187,9 @@ add_custom_target(send_v3k
   DEPENDS 
     ${VITA_VPKNAME}.vpk-vpk
     ${CMAKE_BINARY_DIR}/SDL2.dll
-    ${CMAKE_BINARY_DIR}/SDL2_image.dll
-    ${CMAKE_BINARY_DIR}/SDL2_mixer.dll  
     ${CMAKE_BINARY_DIR}/FAudio-CS.dll
     ${CMAKE_BINARY_DIR}/Theorafile.dll
-    ${CMAKE_BINARY_DIR}/VMLPortTemplate.dll
+    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dll
     ${CMAKE_CURRENT_BINARY_DIR}/eboot.bin
 )
 
