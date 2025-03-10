@@ -13,6 +13,8 @@
 #include <VML/Theorafile.h>
 #include <VML/FNA.h>
 
+#include "dialog.h"
+
 /* Must increment from vita C runtime */
 unsigned int sceLibcHeapSize = 300 * 1024 * 1024;
 
@@ -29,12 +31,37 @@ extern void** mono_aot_module_VMLPortTemplate_info;
 
 FILE* mono_log;
 
+int tryLoadCoreModule(const char* module)
+{
+	int ret = sceKernelLoadStartModule(module, 0, NULL, 0, NULL, 0);
+
+	if (ret <= 0) {
+		fatal_error("[VMLPortTemplate] sceKernelLoadStartModule() failed for %s with code: %8x\n", module, ret);
+	} 
+
+	return ret;
+}
+
+int loadCoreModules()
+{
+	int ret = 0;
+	int cont = 1;
+	
+	ret = tryLoadCoreModule(LIBFIOS2_PATH);
+	cont &= (ret > 0);
+
+	ret = tryLoadCoreModule(LIBC_PATH);
+	cont &= (ret > 0);
+
+	return cont;
+}
+
 int tryLoadModule(const char* module)
 {
 	int ret = sceKernelLoadStartModule(module, 0, NULL, 0, NULL, 0);
 
 	if (ret <= 0) {
-		fprintf(mono_log, "[VMLPortTemplate] sceKernelLoadStartModule() failed for %s with code: %8x\n", module, ret);
+		fatal_error("[VMLPortTemplate] sceKernelLoadStartModule() failed for %s with code: %8x\n", module, ret);
 	} else {
 		fprintf(mono_log, "[VMLPortTemplate] sceKernelLoadStartModule() ran successfully for %s!\n", module);
 	}
@@ -54,14 +81,6 @@ int loadModules()
 		fprintf(mono_log, "[VMLPortTemplate] sceSysmoduleLoadModule(SCE_SYSMODULE_NET) ran successfully!\n");
 	}
 	cont &= (ret >= 0);
-
-#ifdef USE_CUSTOM_LIBC
-	ret = tryLoadModule(LIBFIOS2_PATH);
-	cont &= (ret > 0);
-
-	ret = tryLoadModule(LIBC_PATH);
-	cont &= (ret > 0);
-#endif
 	
 	ret = tryLoadModule(SUPRX_MANAGER_PATH);
 	cont &= (ret > 0);
@@ -145,12 +164,12 @@ int main(int argc, char* argv[])
 {
 	int ret = 0;
 
-	SDL_LogInit();
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
-	SDL_LogSetOutputFunction(SDL_CustomLogFunction, NULL);
-
-	SDL_SetHint("FNA3D_FORCE_DRIVER", "OpenGL");
-	SDL_SetHint("FNA3D_FORCE_MODES", "960x544");
+#ifdef USE_CUSTOM_LIBC
+	/* Need to load libc first */
+	ret = loadCoreModules();
+	if (!ret)
+		return 0;
+#endif
 
 	if(!(mono_log = fopen("ux0:data/VMLPortTemplate.log", "w")))
 	{
@@ -161,6 +180,13 @@ int main(int argc, char* argv[])
 	{
 		return 1;
 	}
+
+	SDL_LogInit();
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
+	SDL_LogSetOutputFunction(SDL_CustomLogFunction, NULL);
+
+	SDL_SetHint("FNA3D_FORCE_DRIVER", "OpenGL");
+	SDL_SetHint("FNA3D_FORCE_MODES", "960x544");
 
 	log_file_mutex = SDL_CreateMutex();
 

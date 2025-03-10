@@ -72,8 +72,14 @@ compile_mono_assembly_aot(
 
 add_executable(${PROJECT_NAME}
   main.c
+  dialog.c
   ${PROJECT_NAME}.dll.s
 )
+
+set(VML_CORE_C_LIBRARY SceLibcMonoBridge_stub)
+if(FOR_VITA3K)
+  set(VML_CORE_C_LIBRARY SceLibc_stub)
+endif()
 
 add_dependencies(${PROJECT_NAME} ExternalVMLFNA)
 
@@ -94,7 +100,7 @@ target_link_libraries(${PROJECT_NAME} mathneon)
 # stubs
 target_link_libraries(${PROJECT_NAME} mono-vita_stub PTHREAD_PRX_stub SUPRXManager_stub_weak)
 target_link_libraries(${PROJECT_NAME} SceLibDbg_stub SceAudio_stub SceAudioIn_stub SceCtrl_stub ScePower_stub SceMotion_stub SceHid_stub SceTouch_stub SceGxm_stub SceCommonDialog_stub SceDisplay_stub)
-target_link_libraries(${PROJECT_NAME} SceSysmodule_stub SceAppMgr_stub SceAppUtil_stub SceLibKernel_stub SceSysmem_stub SceIofilemgr_stub SceRtc_stub SceAppUtil_stub SceIme_stub SceNet_stub SceKernelThreadMgr_stub SceLibcMonoBridge_stub SceFios2_stub SceLibKernel_stub)
+target_link_libraries(${PROJECT_NAME} SceSysmodule_stub SceAppMgr_stub SceAppUtil_stub SceLibKernel_stub SceSysmem_stub SceIofilemgr_stub SceRtc_stub SceAppUtil_stub SceIme_stub SceNet_stub SceKernelThreadMgr_stub ${VML_CORE_C_LIBRARY} SceFios2_stub SceLibKernel_stub)
 
 # vita shark and low level stubs
 target_link_libraries(${PROJECT_NAME} ${VITASHARK_LIBRARY} SceShaccCgExt)
