@@ -150,6 +150,7 @@ int main(int argc, char* argv[])
 	SDL_LogSetOutputFunction(SDL_CustomLogFunction, NULL);
 
 	SDL_SetHint("FNA3D_FORCE_DRIVER", "OpenGL");
+	SDL_SetHint("FNA3D_FORCE_MODES", "960x544");
 
 	if(!(mono_log = fopen("ux0:data/VMLPortTemplate.log", "w")))
 	{
