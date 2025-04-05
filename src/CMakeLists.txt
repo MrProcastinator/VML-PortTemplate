@@ -73,6 +73,7 @@ compile_mono_assembly_aot(
 add_executable(${PROJECT_NAME}
   main.c
   dialog.c
+  heap.c
   ${PROJECT_NAME}.dll.s
 )
 
@@ -94,17 +95,18 @@ target_link_libraries(${PROJECT_NAME} FAudio theorafile FNA3D mojoshader)
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY} ${GL_LIBRARY})
 
 # newlib and utils
-target_link_libraries(${PROJECT_NAME} m z supc++)
+target_link_libraries(${PROJECT_NAME} c m z stdc++)
 target_link_libraries(${PROJECT_NAME} mathneon)
+target_link_libraries(${PROJECT_NAME} SceLibDbg_stub SceLibKernel_stub SceAppMgr_stub SceAppUtil_stub SceCommonDialog_stub SceGxm_stub SceDisplay_stub SceSysmodule_stub)
 
 # stubs
 target_link_libraries(${PROJECT_NAME} mono-vita_stub PTHREAD_PRX_stub SUPRXManager_stub_weak)
-target_link_libraries(${PROJECT_NAME} SceLibDbg_stub SceAudio_stub SceAudioIn_stub SceCtrl_stub ScePower_stub SceMotion_stub SceHid_stub SceTouch_stub SceGxm_stub SceCommonDialog_stub SceDisplay_stub)
-target_link_libraries(${PROJECT_NAME} SceSysmodule_stub SceAppMgr_stub SceAppUtil_stub SceLibKernel_stub SceSysmem_stub SceIofilemgr_stub SceRtc_stub SceAppUtil_stub SceIme_stub SceNet_stub SceKernelThreadMgr_stub ${VML_CORE_C_LIBRARY} SceFios2_stub SceLibKernel_stub)
+target_link_libraries(${PROJECT_NAME} SceAudio_stub SceAudioIn_stub SceCtrl_stub ScePower_stub SceMotion_stub SceHid_stub SceIme_stub SceTouch_stub SceGxm_stub)
+target_link_libraries(${PROJECT_NAME} SceSysmem_stub SceIofilemgr_stub SceRtc_stub SceAppUtil_stub SceNet_stub SceKernelThreadMgr_stub ${VML_CORE_C_LIBRARY} SceFios2_stub SceLibKernel_stub)
 
 # vita shark and low level stubs
 target_link_libraries(${PROJECT_NAME} ${VITASHARK_LIBRARY} SceShaccCgExt)
-target_link_libraries(${PROJECT_NAME} taihen_stub SceShaccCg_stub SceKernelDmacMgr_stub SceKernelModulemgr_stub)
+target_link_libraries(${PROJECT_NAME} taihen_stub SceShaccCg_stub SceKernelDmacMgr_stub)
 
 set(VITA_APP_NAME "VML Port Template")
 set(VITA_TITLEID  "VMLPORTTP")

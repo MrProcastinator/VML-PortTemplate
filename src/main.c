@@ -15,9 +15,6 @@
 
 #include "dialog.h"
 
-/* Must increment from vita C runtime */
-unsigned int sceLibcHeapSize = 300 * 1024 * 1024;
-
 #define VML_USE_OPT_PARAM
 #define ASSEMBLIES_DLL_FILE			"app0:/VML/VMLPortTemplate.dll"
 
@@ -46,12 +43,20 @@ int loadCoreModules()
 {
 	int ret = 0;
 	int cont = 1;
+
+	ret = sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
+	if (ret < 0) {
+		fatal_error("[VMLPortTemplate] sceSysmoduleLoadModule(SCE_SYSMODULE_NET) failed with code: %8x\n", ret);
+	}
+	cont &= (ret >= 0);
 	
+#ifdef USE_CUSTOM_LIBC
 	ret = tryLoadCoreModule(LIBFIOS2_PATH);
 	cont &= (ret > 0);
 
 	ret = tryLoadCoreModule(LIBC_PATH);
 	cont &= (ret > 0);
+#endif
 
 	return cont;
 }
@@ -73,14 +78,6 @@ int loadModules()
 {
 	int ret = 0;
 	int cont = 1;
-
-	ret = sceSysmoduleLoadModule(SCE_SYSMODULE_NET);	
-	if (ret < 0) {
-		fprintf(mono_log, "[VMLPortTemplate] sceSysmoduleLoadModule(SCE_SYSMODULE_NET) failed with code: %8x\n", ret);
-	} else {
-		fprintf(mono_log, "[VMLPortTemplate] sceSysmoduleLoadModule(SCE_SYSMODULE_NET) ran successfully!\n");
-	}
-	cont &= (ret >= 0);
 	
 	ret = tryLoadModule(SUPRX_MANAGER_PATH);
 	cont &= (ret > 0);
@@ -138,7 +135,6 @@ static const char* category_strings[] = {
     "TEST",
 };
 
-FILE* vml_port_template_log_file;
 SDL_mutex* log_file_mutex;
 
 /* Uncomment to disable logging */
@@ -149,10 +145,10 @@ static void SDL_CustomLogFunction(void *userdata, int category, SDL_LogPriority 
 #ifdef USE_CUSTOM_LOGGING
 	if(SDL_mutexP(log_file_mutex) == -1)
 		fprintf(mono_log, "[VMLPortTemplate] Couldn't lock log mutex\n");
-	if(vml_port_template_log_file)
+	if(mono_log)
 	{
-		fprintf(vml_port_template_log_file, "[%s][%s] %s\n", category >= 0 && category < SDL_LOG_CATEGORY_CUSTOM ? category_strings[category] : "CUSTOM", priority_strings[priority], message);
-		fflush(vml_port_template_log_file);
+		fprintf(mono_log, "[%s][%s] %s\n", category >= 0 && category < SDL_LOG_CATEGORY_CUSTOM ? category_strings[category] : "CUSTOM", priority_strings[priority], message);
+		fflush(mono_log);
 	}
 	if(SDL_mutexV(log_file_mutex) == -1)
 		fprintf(mono_log, "[VMLPortTemplate] Couldn't unlock log mutex\n");
@@ -176,11 +172,6 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	if(!(vml_port_template_log_file = fopen("ux0:data/VMLPortTemplate-SDL.log", "w")))
-	{
-		return 1;
-	}
-
 	SDL_LogInit();
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
 	SDL_LogSetOutputFunction(SDL_CustomLogFunction, NULL);
@@ -194,13 +185,17 @@ int main(int argc, char* argv[])
 		fprintf(mono_log, "[VMLPortTemplate] Couldn't start mutex\n");
 	else
 		fprintf(mono_log, "[VMLPortTemplate] Mutex started\n");
+	fflush(mono_log);
 
 	ret = loadModules();
 	if (!ret)
 		return 0;
+	fflush(mono_log);
 
 	fprintf(mono_log, "[VMLPortTemplate] Setting mono paths\n");
 	VMLSetPaths("app0:VML", "app0:VML/mono/2.0/machine.config");
+	fprintf(mono_log, "[VMLPortTemplate] Setting command line args\n");
+	VMLSetCommandLineArgs(argc, argv);
 	fprintf(mono_log, "[VMLPortTemplate] Initializing VML\n");
 
 	fflush(mono_log);
@@ -222,7 +217,6 @@ int main(int argc, char* argv[])
 		fprintf(mono_log, "[VMLPortTemplate] VMLInitialize(): 0x%08X", ret);
 
 	SDL_DestroyMutex(log_file_mutex);
-	fclose(vml_port_template_log_file);
 	fclose(mono_log);
 
 	return 0;
