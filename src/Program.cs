@@ -1,15 +1,26 @@
 ﻿using System;
+using SDL2;
 
 static class Program
 {
 	[STAThread]
 	static int Main()
 	{
-		using (Program.main = new VMLPortTemplate.Main())
+		try
 		{
-			Program.main.Run();
-			return 0;
+			using (Program.main = new VMLPortTemplate.Main())
+			{
+				Program.main.Run();
+			}
 		}
+		catch (Exception ex)
+		{
+			var message = ex.GetType().FullName + ":" + ex.Message;
+			SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR, "Unexpected Mono exception", message, IntPtr.Zero);
+			SDL.SDL_LogError((int)SDL.SDL_LogCategory.SDL_LOG_CATEGORY_APPLICATION, message);
+			SDL.SDL_LogError((int)SDL.SDL_LogCategory.SDL_LOG_CATEGORY_APPLICATION, ex.StackTrace);
+		}
+		return 0;
 	}
 
 	public static VMLPortTemplate.Main main;
