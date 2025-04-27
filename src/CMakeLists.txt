@@ -100,7 +100,7 @@ target_link_libraries(${PROJECT_NAME} mathneon)
 target_link_libraries(${PROJECT_NAME} SceLibDbg_stub SceLibKernel_stub SceAppMgr_stub SceAppUtil_stub SceCommonDialog_stub SceGxm_stub SceDisplay_stub SceSysmodule_stub)
 
 # stubs
-target_link_libraries(${PROJECT_NAME} mono-vita_stub PTHREAD_PRX_stub SUPRXManager_stub_weak)
+target_link_libraries(${PROJECT_NAME} MONO_stub PTHREAD_PRX_stub SUPRXManager_stub_weak)
 target_link_libraries(${PROJECT_NAME} SceAudio_stub SceAudioIn_stub SceCtrl_stub ScePower_stub SceMotion_stub SceHid_stub SceIme_stub SceTouch_stub SceGxm_stub)
 target_link_libraries(${PROJECT_NAME} SceSysmem_stub SceIofilemgr_stub SceRtc_stub SceAppUtil_stub SceNet_stub SceKernelThreadMgr_stub ${VML_CORE_C_LIBRARY} SceFios2_stub SceLibKernel_stub)
 
