@@ -15,11 +15,13 @@
 
 #include "dialog.h"
 
+#define IS_LOADED(x) ((x) > 0 || (x) == SCE_KERNEL_ERROR_MODULEMGR_OLD_LIB || (x) == SCE_KERNEL_ERROR_MODULEMGR_IN_USE)
+
 #define VML_USE_OPT_PARAM
 #define ASSEMBLIES_DLL_FILE			"app0:/VML/VMLPortTemplate.dll"
 
-#define LIBFIOS2_PATH				"ur0:/data/VML/libfios2.suprx"
-#define LIBC_PATH					"ur0:/data/VML/libc.suprx"
+#define LIBFIOS2_PATH				"vs0:/sys/external/libfios2.suprx"
+#define LIBC_PATH					"vs0:/sys/external/libc.suprx"
 #define SUPRX_MANAGER_PATH			"ur0:/data/VML/SUPRXManager.suprx"
 #define MONO_VITA_PATH				"ur0:/data/VML/mono-vita.suprx"
 #define PTHREAD_PATH				"ur0:/data/VML/pthread.suprx"
@@ -32,7 +34,7 @@ int tryLoadCoreModule(const char* module)
 {
 	int ret = sceKernelLoadStartModule(module, 0, NULL, 0, NULL, 0);
 
-	if (ret <= 0) {
+	if (!IS_LOADED(ret)) {
 		fatal_error("[VMLPortTemplate] sceKernelLoadStartModule() failed for %s with code: %8x\n", module, ret);
 	} 
 
@@ -52,10 +54,10 @@ int loadCoreModules()
 	
 #ifdef USE_CUSTOM_LIBC
 	ret = tryLoadCoreModule(LIBFIOS2_PATH);
-	cont &= (ret > 0);
+	cont &= IS_LOADED(ret);
 
 	ret = tryLoadCoreModule(LIBC_PATH);
-	cont &= (ret > 0);
+	cont &= IS_LOADED(ret);
 #endif
 
 	return cont;
@@ -65,7 +67,7 @@ int tryLoadModule(const char* module)
 {
 	int ret = sceKernelLoadStartModule(module, 0, NULL, 0, NULL, 0);
 
-	if (ret <= 0) {
+	if (!IS_LOADED(ret)) {
 		fatal_error("[VMLPortTemplate] sceKernelLoadStartModule() failed for %s with code: %8x\n", module, ret);
 	} else {
 		fprintf(mono_log, "[VMLPortTemplate] sceKernelLoadStartModule() ran successfully for %s!\n", module);
@@ -80,13 +82,13 @@ int loadModules()
 	int cont = 1;
 	
 	ret = tryLoadModule(SUPRX_MANAGER_PATH);
-	cont &= (ret > 0);
+	cont &= IS_LOADED(ret);
 	
 	ret = tryLoadModule(PTHREAD_PATH);
-	cont &= (ret > 0);
+	cont &= IS_LOADED(ret);
 
 	ret = tryLoadModule(MONO_VITA_PATH);
-	cont &= (ret > 0);
+	cont &= IS_LOADED(ret);
 
 	return cont;
 }
@@ -160,17 +162,20 @@ int main(int argc, char* argv[])
 {
 	int ret = 0;
 
-#ifdef USE_CUSTOM_LIBC
 	/* Need to load libc first */
 	ret = loadCoreModules();
 	if (!ret)
 		return 0;
-#endif
 
 	if(!(mono_log = fopen("ux0:data/VMLPortTemplate.log", "w")))
 	{
 		return 1;
 	}
+
+	ret = loadModules();
+	if (!ret)
+		return 0;
+	fflush(mono_log);
 
 	SDL_LogInit();
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
@@ -185,11 +190,6 @@ int main(int argc, char* argv[])
 		fprintf(mono_log, "[VMLPortTemplate] Couldn't start mutex\n");
 	else
 		fprintf(mono_log, "[VMLPortTemplate] Mutex started\n");
-	fflush(mono_log);
-
-	ret = loadModules();
-	if (!ret)
-		return 0;
 	fflush(mono_log);
 
 	fprintf(mono_log, "[VMLPortTemplate] Setting mono paths\n");
