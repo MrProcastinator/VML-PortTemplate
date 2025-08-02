@@ -22,9 +22,11 @@
 
 #include "dialog.h"
 
-#ifndef USE_PVR
-#include <vitaGL.h>
+#ifdef USE_PVR
+#error "PVR is not supported, use vitaGL."
 #endif
+
+#include <vitaGL.h>
 
 static uint16_t ime_title_utf16[SCE_IME_DIALOG_MAX_TITLE_LENGTH];
 static uint16_t ime_initial_text_utf16[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
@@ -141,19 +143,12 @@ void fatal_error(const char *fmt, ...) {
   vsnprintf(string, sizeof(string), fmt, list);
   va_end(list);
 
-#if GRAPHICS_API==GRAPHICS_API_VITAGL
   vglInit(0);
 
   init_msg_dialog(string);
 
   while (!get_msg_dialog_result())
     vglSwapBuffers(GL_TRUE);
-
-#else
-  // TODO: Init PVR here.
-  debugPrintf("Fatal error occured: ");
-  debugPrintf(string);
-#endif
 
   sceKernelExitProcess(0);
   while (1);
