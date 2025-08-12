@@ -85,7 +85,6 @@ endif()
 add_dependencies(${PROJECT_NAME} ExternalVMLFNA)
 
 # VML libraries
-target_link_libraries(${PROJECT_NAME} VitaMonoLoader VMLCoreAssemblies)
 target_link_libraries(${PROJECT_NAME} VMLSDL2 VMLFAudio VMLTheorafile VMLFNA)
 
 # FNA dependencies
@@ -93,6 +92,9 @@ target_link_libraries(${PROJECT_NAME} FAudio theorafile FNA3D mojoshader)
 
 # SDL and opengl
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY} ${GL_LIBRARY})
+
+# VitaMonoLoader and core assemblies
+target_link_libraries(${PROJECT_NAME} VitaMonoLoader VMLCoreAssemblies)
 
 # newlib and utils
 target_link_libraries(${PROJECT_NAME} m z stdc++)
@@ -102,11 +104,11 @@ target_link_libraries(${PROJECT_NAME} SceLibDbg_stub SceLibKernel_stub SceAppMgr
 # stubs
 target_link_libraries(${PROJECT_NAME} MONO_stub PTHREAD_PRX_stub SUPRXManager_stub_weak)
 target_link_libraries(${PROJECT_NAME} SceAudio_stub SceAudioIn_stub SceCtrl_stub ScePower_stub SceMotion_stub SceHid_stub SceIme_stub SceTouch_stub SceGxm_stub)
-target_link_libraries(${PROJECT_NAME} SceSysmem_stub SceIofilemgr_stub SceRtc_stub SceAppUtil_stub SceNet_stub SceKernelThreadMgr_stub ${VML_CORE_C_LIBRARY} SceFios2_stub SceLibKernel_stub)
+target_link_libraries(${PROJECT_NAME} SceSysmem_stub SceIofilemgr_stub SceRtc_stub SceAppUtil_stub SceNet_stub SceKernelThreadMgr_stub SceFios2_stub)
 
 # vita shark and low level stubs
 target_link_libraries(${PROJECT_NAME} ${VITASHARK_LIBRARY} SceShaccCgExt)
-target_link_libraries(${PROJECT_NAME} taihen_stub SceShaccCg_stub SceKernelDmacMgr_stub)
+target_link_libraries(${PROJECT_NAME} taihen_stub SceShaccCg_stub SceKernelDmacMgr_stub SceLibKernel_stub ${VML_CORE_C_LIBRARY})
 
 set(VITA_APP_NAME "VML Port Template")
 set(VITA_TITLEID  "VMLPORTTP")
@@ -142,22 +144,22 @@ add_custom_target(send
   DEPENDS ${VITA_VPKNAME}.vpk-vpk
 )
 
-add_custom_target(send_kvdb
+add_custom_target(send_vcomp
   COMMAND echo destroy | nc ${PSVITA_IP} 1338
   COMMAND curl --ftp-method nocwd -T ${CMAKE_CURRENT_BINARY_DIR}/eboot.bin ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-  COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/Mono.Posix.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/Mono.Security.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.Configuration.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.Core.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.Security.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.Xml.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/mscorlib.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/SDL2.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/FAudio-CS.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/Theorafile.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/FNA.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
-	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
+  COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/Mono.Posix.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/Mono.Security.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.Configuration.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.Core.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.Security.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.Xml.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/System.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${SFV_FOLDER}/Tools/MonoPSP2/mscorlib.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/SDL2.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/FAudio-CS.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/Theorafile.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/FNA.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+	COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
   COMMAND echo launch ${VITA_TITLEID} | nc ${PSVITA_IP} 1338
   DEPENDS
     ${VITA_VPKNAME}.vpk-vpk
@@ -167,6 +169,27 @@ add_custom_target(send_kvdb
     ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dll
     ${CMAKE_CURRENT_BINARY_DIR}/eboot.bin
 )
+
+add_custom_target(send_cs_vcomp
+  COMMAND echo destroy | nc ${PSVITA_IP} 1338
+  COMMAND curl --ftp-method nocwd -T ${CMAKE_CURRENT_BINARY_DIR}/eboot.bin ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
+  COMMAND curl --ftp-method nocwd -T ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dll ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/VML/
+  COMMAND echo launch ${VITA_TITLEID} | nc ${PSVITA_IP} 1338
+  DEPENDS
+    ${VITA_VPKNAME}.vpk-vpk
+    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dll
+    ${CMAKE_CURRENT_BINARY_DIR}/eboot.bin
+)
+
+add_custom_target(send_eboot_vcomp
+  COMMAND echo destroy | nc ${PSVITA_IP} 1338
+  COMMAND curl --ftp-method nocwd -T ${CMAKE_CURRENT_BINARY_DIR}/eboot.bin ftp://${PSVITA_IP}:1337/ux0:/app/${VITA_TITLEID}/
+  COMMAND echo launch ${VITA_TITLEID} | nc ${PSVITA_IP} 1338
+  DEPENDS
+    ${VITA_VPKNAME}.vpk-vpk
+    ${CMAKE_CURRENT_BINARY_DIR}/eboot.bin
+)
+
 add_custom_target(send_v3k
   COMMAND ${CMAKE_COMMAND} -E copy
     ${SFV_FOLDER}/Tools/MonoPSP2/Mono.Posix.dll

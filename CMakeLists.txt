@@ -16,9 +16,9 @@ project(VMLTemplate-CS)
 
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -marm -mtune=cortex-a9 -mfpu=neon -Wno-incompatible-pointer-types -Wno-stringop-overflow -Wno-deprecated-declarations")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-incompatible-pointer-types -Wno-stringop-overflow -Wno-deprecated-declarations")
 # HACK: don't know why but SceLibcMonoBridge causes problems with some C symbols, must use libsupc++ manually to link some c++ symbols
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--allow-multiple-definition")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-q -Wl,--allow-multiple-definition")
 
 add_custom_target(ExternalVMLFNA)
 

@@ -23,16 +23,17 @@ namespace VMLPortTemplate
 			this.graphics.PreferredBackBufferWidth = 960;
 			this.graphics.PreferredBackBufferHeight = 544;
 			this.graphics.IsFullScreen = true;
-			this.graphics.ApplyChanges();
 		}
 
 		protected override void Initialize()
 		{
+			this.graphics.ApplyChanges();
 			base.Initialize();
 		}
 
 		protected override void LoadContent()
 		{
+			spriteBatch = new SpriteBatch(GraphicsDevice);
 		}
 
 		protected override void UnloadContent()
@@ -46,6 +47,7 @@ namespace VMLPortTemplate
 
 		protected override void Draw(GameTime gameTime)
 		{
+			GraphicsDevice.Clear(Color.CornflowerBlue);
 			base.Draw(gameTime);
 		}
 

@@ -6,6 +6,7 @@
 #include <SDL2/SDL_thread.h>
 
 #include <vitasdk.h>
+#include <vitaGL.h>
 
 #include <VML/VML.h>
 #include <VML/SDL2/SDL.h>
@@ -184,6 +185,8 @@ int main(int argc, char* argv[])
 	SDL_SetHint("FNA3D_FORCE_DRIVER", "OpenGL");
 	SDL_SetHint("FNA3D_FORCE_MODES", "960x544");
 
+	fprintf(mono_log, "[VMLPortTemplate] Creating log mutex\n");
+	fflush(mono_log);
 	log_file_mutex = SDL_CreateMutex();
 
 	if(!log_file_mutex)
