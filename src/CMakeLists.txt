@@ -78,9 +78,6 @@ add_executable(${PROJECT_NAME}
 )
 
 set(VML_CORE_C_LIBRARY SceLibcMonoBridge_stub)
-if(FOR_VITA3K)
-  set(VML_CORE_C_LIBRARY SceLibc_stub)
-endif()
 
 add_dependencies(${PROJECT_NAME} ExternalVMLFNA)
 
