@@ -140,7 +140,7 @@ static const char* category_strings[] = {
 
 SDL_mutex* log_file_mutex;
 
-/* Uncomment to disable logging */
+/* Comment to disable logging */
 #define USE_CUSTOM_LOGGING
 
 static void SDL_CustomLogFunction(void *userdata, int category, SDL_LogPriority priority, const char *message)
