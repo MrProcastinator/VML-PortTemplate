@@ -60,6 +60,12 @@ set(VML_PORT_TEMPLATE_SOURCES
   "Debug.cs" # For internal debugging purposes
 )
 
+if($CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-DVML_DEBUG)
+else()
+  add_definitions(-DVML_RELEASE)
+endif()
+
 separate_arguments(SDL2_IMAGE_DEPENDENCIES)
 separate_arguments(SDL2_MIXER_DEPENDENCIES)
 

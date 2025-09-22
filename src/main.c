@@ -16,6 +16,12 @@
 
 #include "dialog.h"
 
+#ifdef VML_DEBUG
+#define MONO_VERBOSE_DEBUG true
+#else
+#define MONO_VERBOSE_DEBUG false
+#endif
+
 #define IS_LOADED(x) ((x) > 0 || (x) == SCE_KERNEL_ERROR_MODULEMGR_OLD_LIB || (x) == SCE_KERNEL_ERROR_MODULEMGR_IN_USE)
 
 #define VML_USE_OPT_PARAM
@@ -209,7 +215,7 @@ int main(int argc, char* argv[])
 	optParam.cpuAffinity = SCE_KERNEL_CPU_MASK_USER_0;
 	optParam.priority = SCE_KERNEL_INDIVIDUAL_QUEUE_HIGHEST_PRIORITY;
 	optParam.programName = "";
-	optParam.monoVerboseDebug = true;
+	optParam.monoVerboseDebug = MONO_VERBOSE_DEBUG;
 
 	ret = VMLInitialize(rootEntry, &optParam);
 #else
