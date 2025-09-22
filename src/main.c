@@ -27,8 +27,8 @@
 #define VML_USE_OPT_PARAM
 #define ASSEMBLIES_DLL_FILE			"app0:/VML/VMLPortTemplate.dll"
 
-#define LIBFIOS2_PATH				"vs0:/sys/external/libfios2.suprx"
-#define LIBC_PATH					"vs0:/sys/external/libc.suprx"
+#define LIBFIOS2_PATH				"ur0:/sys/external/libfios2.suprx"
+#define LIBC_PATH					"ur0:/sys/external/libc.suprx"
 #define SUPRX_MANAGER_PATH			"ur0:/data/VML/SUPRXManager.suprx"
 #define MONO_VITA_PATH				"ur0:/data/VML/mono-vita.suprx"
 #define PTHREAD_PATH				"ur0:/data/VML/pthread.suprx"
