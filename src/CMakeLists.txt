@@ -60,7 +60,26 @@ set(VML_PORT_TEMPLATE_SOURCES
   "Debug.cs" # For internal debugging purposes
 )
 
-if($CMAKE_BUILD_TYPE STREQUAL "Debug")
+compile_mono_assembly_aot(
+  SOURCES ${VML_PORT_TEMPLATE_SOURCES}
+  ASSEMBLY ${PROJECT_NAME}
+  REFERENCES ${VML_PORT_TEMPLATE_REFERENCES}
+  DEFINES ${VML_PORT_TEMPLATE_DEFINES}
+  FLAGS unsafe
+  OPTIMIZE
+)
+
+set(VML_FILES "")
+get_mono_files(VML_FILES)
+
+set(FNA_FILES
+  ${CMAKE_BINARY_DIR}/SDL2.dll VML/SDL2.dll
+  ${CMAKE_BINARY_DIR}/FAudio-CS.dll VML/FAudio-CS.dll
+  ${CMAKE_BINARY_DIR}/Theorafile.dll VML/Theorafile.dll
+  ${CMAKE_BINARY_DIR}/FNA.dll VML/FNA.dll
+)
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
   add_definitions(-DVML_DEBUG)
 else()
   add_definitions(-DVML_RELEASE)
@@ -69,21 +88,26 @@ endif()
 separate_arguments(SDL2_IMAGE_DEPENDENCIES)
 separate_arguments(SDL2_MIXER_DEPENDENCIES)
 
-compile_mono_assembly_aot(
-  SOURCES ${VML_PORT_TEMPLATE_SOURCES}
-  ASSEMBLY ${PROJECT_NAME}
-  REFERENCES ${VML_PORT_TEMPLATE_REFERENCES}
-  DEFINES ${VML_PORT_TEMPLATE_DEFINES}
-)
+set(VML_PORT_TEMPLATE_AOT_SOURCES ${PROJECT_NAME}.dll.s)
+set(VML_PORT_TEMPLATE_EXTERNAL_TARGET ${PROJECT_NAME})
+if(USE_LINKER_SCRIPT)
+  add_library(
+    VML${PROJECT_NAME} STATIC
+    ${PROJECT_NAME}.dll.s
+  )
+  set(VML_PORT_TEMPLATE_AOT_SOURCES "")
+  set(VML_PORT_TEMPLATE_EXTERNAL_TARGET VML${PROJECT_NAME})
+endif()
 
 add_executable(${PROJECT_NAME}
   main.c
   dialog.c
   heap.c
-  ${PROJECT_NAME}.dll.s
+  ${VML_PORT_TEMPLATE_AOT_SOURCES}
+  ${VML_PORT_TEMPLATE_VITA_COMPAT_C_SOURCES}
 )
 
-set(VML_CORE_C_LIBRARY SceLibcMonoBridge_stub)
+add_dependencies(${VML_PORT_TEMPLATE_EXTERNAL_TARGET} ExternalVMLFNA)
 
 add_dependencies(${PROJECT_NAME} ExternalVMLFNA)
 
@@ -102,9 +126,9 @@ target_link_libraries(${PROJECT_NAME} VitaMonoLoader VMLCoreAssemblies)
 # newlib and utils
 target_link_libraries(${PROJECT_NAME} m z stdc++)
 target_link_libraries(${PROJECT_NAME} mathneon)
-target_link_libraries(${PROJECT_NAME} SceLibDbg_stub SceLibKernel_stub SceAppMgr_stub SceAppUtil_stub SceCommonDialog_stub SceGxm_stub SceDisplay_stub SceSysmodule_stub)
 
 # stubs
+target_link_libraries(${PROJECT_NAME} SceLibDbg_stub SceLibKernel_stub SceAppMgr_stub SceAppUtil_stub SceCommonDialog_stub SceGxm_stub SceDisplay_stub SceSysmodule_stub)
 target_link_libraries(${PROJECT_NAME} MONO_stub PTHREAD_PRX_stub SUPRXManager_stub_weak)
 target_link_libraries(${PROJECT_NAME} SceAudio_stub SceAudioIn_stub SceCtrl_stub ScePower_stub SceMotion_stub SceHid_stub SceIme_stub SceTouch_stub SceGxm_stub)
 target_link_libraries(${PROJECT_NAME} SceSysmem_stub SceIofilemgr_stub SceRtc_stub SceAppUtil_stub SceNet_stub SceKernelThreadMgr_stub SceFios2_stub)
@@ -112,6 +136,11 @@ target_link_libraries(${PROJECT_NAME} SceSysmem_stub SceIofilemgr_stub SceRtc_st
 # vita shark and low level stubs
 target_link_libraries(${PROJECT_NAME} ${VITASHARK_LIBRARY} SceShaccCgExt)
 target_link_libraries(${PROJECT_NAME} taihen_stub SceShaccCg_stub SceKernelDmacMgr_stub SceLibKernel_stub ${VML_CORE_C_LIBRARY})
+
+# VML Port
+if(USE_LINKER_SCRIPT)
+  target_link_libraries(${PROJECT_NAME} VML${PROJECT_NAME})
+endif()
 
 set(VITA_APP_NAME "VML Port Template")
 set(VITA_TITLEID  "VMLPORTTP")
